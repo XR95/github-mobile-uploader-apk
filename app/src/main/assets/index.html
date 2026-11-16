@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>GitHub Mobile Uploader</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#edf2ff;font:15px system-ui,Arial}
+main{max-width:900px;margin:auto;padding:18px}.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.logo{width:44px;height:44px;border-radius:14px;background:#24344f;display:grid;place-items:center;font-size:24px}
+h1{font-size:19px;margin:0}.sub{color:#9aabc4;font-size:12px;margin-top:3px}
+.card{background:#141f31;border:1px solid #26364e;border-radius:18px;padding:16px;margin:12px 0}
+.status{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pill{border-radius:30px;padding:6px 10px;background:#49351d;color:#ffd18a;font-size:12px}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}
+button{border:0;border-radius:12px;padding:13px 8px;color:white;font-weight:700;background:#263750}
+.start{background:#137a50}.stop{background:#a43b48}.restart{background:#315fbd}
+button:active{opacity:.75}.hint{color:#9aabc4;font-size:12px;line-height:1.5}
+h2{font-size:15px;margin:0 0 10px}.frame{height:65vh;min-height:360px;border:1px solid #26364e;border-radius:14px;overflow:hidden;background:#fff}
+iframe{width:100%;height:100%;border:0;background:white}.msg{font-size:12px;color:#9fb3d2;min-height:18px;margin-top:10px}
+@media(max-width:380px){main{padding:12px}.actions{gap:6px}button{font-size:12px}}
+</style>
+</head>
+<body><main>
+<div class="top"><div class="logo">⌘</div><div><h1>GitHub Mobile Uploader</h1><div class="sub">XR95 · Termux idarəetmə paneli</div></div></div>
+<section class="card">
+ <div class="status"><b>Termux serveri</b><span id="state" class="pill">Yoxlanılır…</span></div>
+ <div class="actions">
+  <button class="start" onclick="cmd('start')">▶ START</button>
+  <button class="stop" onclick="cmd('stop')">■ STOP</button>
+  <button class="restart" onclick="cmd('restart')">↻ RESTART</button>
+ </div><div id="msg" class="msg">Serveri başlatmaq üçün START düyməsinə toxun.</div>
+</section>
+<section class="card">
+ <h2>Layihə yükləmə paneli</h2>
+ <div class="hint">Panel aşağıda tətbiqin daxilində açılır. Chrome və ya başqa brauzerə keçid edilmir.</div>
+ <div style="height:12px"></div>
+ <div class="frame"><iframe id="panel" title="GitHub yükləmə paneli" src="about:blank"></iframe></div>
+</section>
+<section class="card hint">
+ <b>İlkin şərt:</b> Termux-da ~/glgonder/app.py mövcud olmalıdır. GitHub CLI hesabın XR95 olaraq Termux-da autentifikasiya edilmiş qalmalıdır.
+ <div style="height:8px"></div><button onclick="Android.openTermuxSettings()">Termux parametrləri</button>
+</section>
+</main>
+<script>
+const url='http://127.0.0.1:8765/';
+let loaded=false;
+function showMessage(t){document.getElementById('msg').textContent=t}
+function cmd(c){showMessage(c.toUpperCase()+' əmri göndərilir…');try{Android[c]()}catch(e){showMessage('Əmr göndərilmədi: '+e)}}
+async function check(){
+ try{
+  const r=await fetch(url,{method:'GET',cache:'no-store'});
+  if(r.ok){
+   document.getElementById('state').textContent='İŞLƏYİR';
+   document.getElementById('state').style.background='#124c39';
+   document.getElementById('state').style.color='#8cf0bd';
+   if(!loaded){document.getElementById('panel').src=url;loaded=true}
+  }else throw new Error('offline');
+ }catch(e){
+  document.getElementById('state').textContent='DAYANIB';
+  document.getElementById('state').style.background='#49351d';
+  document.getElementById('state').style.color='#ffd18a';
+  loaded=false;
+  if(document.getElementById('panel').src!=='about:blank') document.getElementById('panel').src='about:blank';
+ }
+}
+setInterval(check,3000);check();
+</script></body></html>
